@@ -2,79 +2,35 @@ import { useState } from "react";
 import POA_LOGO from "./assets/logo.png";
 
 // Backend base URL
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
 const smileyOptions = [
   { value: "poor", label: "Not Satisfied", emoji: "😟", answerId: 1, score: 1 },
   { value: "average", label: "Satisfied", emoji: "😐", answerId: 2, score: 3 },
-  { value: "excellent", label: "Very Satisfied", emoji: "😊", answerId: 3, score: 5 },
-];
-
-const improveOptions = [
-  "Response Time",
-  "Staff/Volunteer Behavior",
-  "Communication & Guidance",
-  "Process Transparency",
-  "Service Quality",
-  "Follow-up / Updates",
-  "Facility Cleanliness & Comfort",
-  "Donation/Receipt Process",
-  "Others",
-];
-
-const serviceOptions = [
-  "Food / Ration Distribution",
-  "Medical / Health Services",
-  "Education Support",
-  "Orphan Care",
-  "Disaster / Emergency Relief",
-  "Clean Water / Water Projects",
-  "Qurbani / Ramadan Program",
-  "Donation / Zakat / Sadqah",
-  "Volunteer Registration",
-  "Others",
+  {
+    value: "excellent",
+    label: "Very Satisfied",
+    emoji: "😊",
+    answerId: 3,
+    score: 5,
+  },
 ];
 
 function App() {
   const [experience, setExperience] = useState(null);
-  const [contact, setContact] = useState("");
-  const [branchCode, setBranchCode] = useState("");
-  const [branchName, setBranchName] = useState("");
-
-  const [improve, setImprove] = useState([]);
-  const [services, setServices] = useState([]);
-  const [details, setDetails] = useState("");
-
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const toggleCheck = (list, setList, value) => {
-    setList((prev) =>
-      prev.includes(value) ? prev.filter((v) => v !== value) : [...prev, value]
-    );
-  };
+  // Hardcoded branch info
+  const BRANCH_CODE = "0001";
+  const BRANCH_NAME = "Alkhidmat";
 
   const validate = () => {
     const e = {};
-
     if (!experience) e.experience = "Please select your satisfaction level.";
-
-    if (!contact.trim()) {
-      e.contact = "Mobile number is required.";
-    } else if (!/^03\d{9}$/.test(contact)) {
-      e.contact = "Enter a valid number (03XXXXXXXXX).";
-    }
-
-    if (!branchCode.trim()) {
-      e.branchCode = "Branch code is required.";
-    }
-
-    if (!branchName.trim()) {
-      e.branchName = "Branch name is required.";
-    }
-
     return e;
   };
 
@@ -85,7 +41,9 @@ function App() {
       return;
     }
 
-    const selectedExperience = smileyOptions.find((opt) => opt.value === experience);
+    const selectedExperience = smileyOptions.find(
+      (opt) => opt.value === experience
+    );
     if (!selectedExperience) {
       setErrors((prev) => ({
         ...prev,
@@ -95,9 +53,8 @@ function App() {
     }
 
     const payload = {
-      branchCode: branchCode.trim(),
-      branchName: branchName.trim(),
-      mobilePhoneNumber: contact.trim(),
+      branchCode: BRANCH_CODE,
+      branchName: BRANCH_NAME,
       questionId: 1,
       answerId: selectedExperience.answerId,
       value: selectedExperience.score,
@@ -109,9 +66,7 @@ function App() {
 
       const res = await fetch(`${API_BASE_URL}/rating`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
@@ -177,11 +132,11 @@ function App() {
           </div>
 
           <h1 style={styles.surveyTitle}>Alkhidmat Feedback Form</h1>
-          <p style={styles.subtitle}>Please answer a few quick questions.</p>
+          <p style={styles.subtitle}>Please answer a quick question.</p>
         </div>
 
         <div style={styles.body}>
-          {/* Q1 */}
+          {/* Q1 (Only question) */}
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
               <div style={styles.qIndex}>1</div>
@@ -190,7 +145,9 @@ function App() {
               </label>
             </div>
 
-            {errors.experience && <span style={styles.error}>{errors.experience}</span>}
+            {errors.experience && (
+              <span style={styles.error}>{errors.experience}</span>
+            )}
 
             <div style={styles.smileyRow}>
               {smileyOptions.map((opt) => {
@@ -209,7 +166,9 @@ function App() {
                     }}
                     aria-pressed={active}
                   >
-                    <span style={{ fontSize: 40, lineHeight: "40px" }}>{opt.emoji}</span>
+                    <span style={{ fontSize: 40, lineHeight: "40px" }}>
+                      {opt.emoji}
+                    </span>
                     <span
                       style={{
                         ...styles.smileyLabel,
@@ -222,138 +181,6 @@ function App() {
                 );
               })}
             </div>
-          </div>
-
-          {/* Q2 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>2</div>
-              <label style={styles.qLabel}>Please enter your mobile number (03XXXXXXXXX)</label>
-            </div>
-
-            {errors.contact && <span style={styles.error}>{errors.contact}</span>}
-
-            <input
-              style={{ ...styles.input, ...(errors.contact ? styles.inputError : null) }}
-              placeholder="03XXXXXXXXX"
-              value={contact}
-              onChange={(e) => {
-                const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 11);
-                setContact(onlyDigits);
-                setErrors((p) => ({ ...p, contact: null }));
-              }}
-              maxLength={11}
-              inputMode="numeric"
-            />
-          </div>
-
-          {/* Q3 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>3</div>
-              <label style={styles.qLabel}>Enter branch code</label>
-            </div>
-
-            {errors.branchCode && <span style={styles.error}>{errors.branchCode}</span>}
-
-            <input
-              style={{ ...styles.input, ...(errors.branchCode ? styles.inputError : null) }}
-              placeholder="Enter branch code"
-              value={branchCode}
-              onChange={(e) => {
-                setBranchCode(e.target.value);
-                setErrors((p) => ({ ...p, branchCode: null }));
-              }}
-            />
-          </div>
-
-          {/* Q4 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>4</div>
-              <label style={styles.qLabel}>Enter branch name</label>
-            </div>
-
-            {errors.branchName && <span style={styles.error}>{errors.branchName}</span>}
-
-            <input
-              style={{ ...styles.input, ...(errors.branchName ? styles.inputError : null) }}
-              placeholder="Enter branch name"
-              value={branchName}
-              onChange={(e) => {
-                setBranchName(e.target.value);
-                setErrors((p) => ({ ...p, branchName: null }));
-              }}
-            />
-          </div>
-
-          {/* Q5 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>5</div>
-              <label style={styles.qLabel}>Which area should we improve?</label>
-            </div>
-
-            <div style={styles.chipsWrap}>
-              {improveOptions.map((opt) => {
-                const active = improve.includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => toggleCheck(improve, setImprove, opt)}
-                    style={{ ...styles.chip, ...(active ? styles.chipActive : null) }}
-                    aria-pressed={active}
-                  >
-                    <span style={styles.chipDot} />
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Q6 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>6</div>
-              <label style={styles.qLabel}>Which service/program is this feedback about?</label>
-            </div>
-
-            <div style={styles.chipsWrap}>
-              {serviceOptions.map((opt) => {
-                const active = services.includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => toggleCheck(services, setServices, opt)}
-                    style={{ ...styles.chip, ...(active ? styles.chipActive : null) }}
-                    aria-pressed={active}
-                  >
-                    <span style={styles.chipDot} />
-                    {opt}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Q7 */}
-          <div style={styles.section}>
-            <div style={styles.sectionHeader}>
-              <div style={styles.qIndex}>7</div>
-              <label style={styles.qLabel}>Any comments/suggestions? (optional)</label>
-            </div>
-
-            <textarea
-              style={styles.textarea}
-              placeholder="Write here..."
-              value={details}
-              onChange={(e) => setDetails(e.target.value.slice(0, 200))}
-              rows={4}
-            />
-            <div style={styles.counter}>{details.length} / 200</div>
           </div>
 
           {submitError && (
@@ -414,7 +241,8 @@ const styles = {
   },
   header: {
     padding: "22px 26px 18px",
-    background: "linear-gradient(135deg, rgba(26,86,160,0.14), rgba(99,102,241,0.10))",
+    background:
+      "linear-gradient(135deg, rgba(26,86,160,0.14), rgba(99,102,241,0.10))",
     borderBottom: "1px solid rgba(226,232,240,0.9)",
   },
   headerTop: {
@@ -503,7 +331,8 @@ const styles = {
     padding: "14px 10px",
     border: "1px solid rgba(226,232,240,0.95)",
     background: "rgba(255,255,255,0.9)",
-    transition: "transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease",
+    transition:
+      "transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease",
     display: "grid",
     placeItems: "center",
     gap: 6,
@@ -516,65 +345,6 @@ const styles = {
   },
   smileyLabel: { fontSize: 12.5, color: "#475569", fontWeight: 700 },
   smileyLabelActive: { color: "#1a56a0" },
-  input: {
-    width: "100%",
-    padding: "11px 12px",
-    border: "1.5px solid rgba(226,232,240,0.95)",
-    borderRadius: 12,
-    fontSize: 13.5,
-    color: "#0f172a",
-    outline: "none",
-    boxSizing: "border-box",
-    background: "rgba(255,255,255,0.9)",
-  },
-  inputError: { borderColor: "rgba(220,38,38,0.55)" },
-  chipsWrap: { display: "flex", flexWrap: "wrap", gap: 10 },
-  chip: {
-    cursor: "pointer",
-    borderRadius: 999,
-    padding: "10px 12px",
-    border: "1px solid rgba(226,232,240,0.95)",
-    background: "rgba(255,255,255,0.9)",
-    color: "#334155",
-    fontSize: 13,
-    fontWeight: 650,
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 10,
-    transition: "transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease",
-  },
-  chipActive: {
-    borderColor: "rgba(26,86,160,0.45)",
-    boxShadow: "0 10px 22px rgba(26,86,160,0.12)",
-    transform: "translateY(-1px)",
-    color: "#0f172a",
-  },
-  chipDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 999,
-    background: "rgba(26,86,160,0.55)",
-  },
-  textarea: {
-    width: "100%",
-    padding: "11px 12px",
-    border: "1.5px solid rgba(226,232,240,0.95)",
-    borderRadius: 12,
-    fontSize: 13.5,
-    color: "#0f172a",
-    outline: "none",
-    resize: "vertical",
-    boxSizing: "border-box",
-    fontFamily: "inherit",
-    background: "rgba(255,255,255,0.9)",
-    minHeight: 92,
-  },
-  counter: {
-    textAlign: "right",
-    fontSize: 12,
-    color: "#94a3b8",
-    marginTop: 6,
-  },
   submitBtn: {
     background: "linear-gradient(135deg, #1a56a0, #4f46e5)",
     color: "#fff",
