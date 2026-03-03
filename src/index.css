@@ -1,0 +1,39 @@
+:root {
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ✅ Make the app fill the screen and remove Vite default dark theme behavior */
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* ✅ Apply your page background globally */
+body {
+  min-width: 320px;
+  background: linear-gradient(135deg, #eef2f7 0%, #dce6f0 100%);
+}
+
+/* Optional: keep links neat */
+a {
+  font-weight: 500;
+  color: #1a56a0;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* ✅ Don't override your button styling inside App.jsx */
+button {
+  font-family: inherit;
+}
