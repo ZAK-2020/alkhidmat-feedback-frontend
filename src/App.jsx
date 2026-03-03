@@ -19,6 +19,8 @@ const smileyOptions = [
 
 function App() {
   const [experience, setExperience] = useState(null);
+  const [contact, setContact] = useState("");
+
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
@@ -30,7 +32,15 @@ function App() {
 
   const validate = () => {
     const e = {};
+
     if (!experience) e.experience = "Please select your satisfaction level.";
+
+    if (!contact.trim()) {
+      e.contact = "Mobile number is required.";
+    } else if (!/^03\d{9}$/.test(contact)) {
+      e.contact = "Enter a valid number (03XXXXXXXXX).";
+    }
+
     return e;
   };
 
@@ -55,6 +65,7 @@ function App() {
     const payload = {
       branchCode: BRANCH_CODE,
       branchName: BRANCH_NAME,
+      mobilePhoneNumber: contact.trim(),
       questionId: 1,
       answerId: selectedExperience.answerId,
       value: selectedExperience.score,
@@ -136,7 +147,7 @@ function App() {
         </div>
 
         <div style={styles.body}>
-          {/* Q1 (Only question) */}
+          {/* Q1 */}
           <div style={styles.section}>
             <div style={styles.sectionHeader}>
               <div style={styles.qIndex}>1</div>
@@ -181,6 +192,31 @@ function App() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Q2 (Mobile number) */}
+          <div style={styles.section}>
+            <div style={styles.sectionHeader}>
+              <div style={styles.qIndex}>2</div>
+              <label style={styles.qLabel}>
+                Please enter your mobile number (03XXXXXXXXX)
+              </label>
+            </div>
+
+            {errors.contact && <span style={styles.error}>{errors.contact}</span>}
+
+            <input
+              style={{ ...styles.input, ...(errors.contact ? styles.inputError : null) }}
+              placeholder="03XXXXXXXXX"
+              value={contact}
+              onChange={(e) => {
+                const onlyDigits = e.target.value.replace(/\D/g, "").slice(0, 11);
+                setContact(onlyDigits);
+                setErrors((p) => ({ ...p, contact: null }));
+              }}
+              maxLength={11}
+              inputMode="numeric"
+            />
           </div>
 
           {submitError && (
@@ -345,6 +381,18 @@ const styles = {
   },
   smileyLabel: { fontSize: 12.5, color: "#475569", fontWeight: 700 },
   smileyLabelActive: { color: "#1a56a0" },
+  input: {
+    width: "100%",
+    padding: "11px 12px",
+    border: "1.5px solid rgba(226,232,240,0.95)",
+    borderRadius: 12,
+    fontSize: 13.5,
+    color: "#0f172a",
+    outline: "none",
+    boxSizing: "border-box",
+    background: "rgba(255,255,255,0.9)",
+  },
+  inputError: { borderColor: "rgba(220,38,38,0.55)" },
   submitBtn: {
     background: "linear-gradient(135deg, #1a56a0, #4f46e5)",
     color: "#fff",
